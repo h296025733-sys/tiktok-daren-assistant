@@ -1,0 +1,71 @@
+{
+  "manifest_version": 3,
+  "name": "TikTok 达人助手",
+  "description": "公司内部 TikTok 视频数据、下载、音频与字幕翻译工具",
+  "version": "0.1.28",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "activeTab",
+    "clipboardWrite",
+    "downloads",
+    "sidePanel",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.tiktok.com/*",
+    "https://*.tiktok.com/*",
+    "https://translate.googleapis.com/*",
+    "https://translate-pa.googleapis.com/*",
+    "https://translate.google.com/*",
+    "https://*.bing.com/*",
+    "https://huggingface.co/*",
+    "https://*.huggingface.co/*",
+    "https://*.hf.co/*",
+    "https://*.xethub.hf.co/*",
+    "https://*.tiktokcdn.com/*",
+    "https://*.tiktokcdn-us.com/*",
+    "https://*.tiktokv.com/*",
+    "https://*.byteoversea.com/*",
+    "https://*.ibytedtos.com/*",
+    "https://*.akamaized.net/*",
+    "https://*.muscdn.com/*",
+    "https://*.byteimg.com/*",
+    "http://127.0.0.1:8765/*",
+    "http://localhost:8765/*"
+  ],
+  "action": {
+    "default_title": "打开 TikTok 达人助手"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.tiktok.com/*"
+      ],
+      "js": [
+        "page-bridge.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://www.tiktok.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src https://translate.googleapis.com https://translate-pa.googleapis.com https://translate.google.com https://*.bing.com https://huggingface.co https://*.huggingface.co https://*.hf.co https://*.xethub.hf.co https://*.tiktok.com https://*.tiktokcdn.com https://*.tiktokcdn-us.com https://*.tiktokv.com https://*.byteoversea.com https://*.ibytedtos.com https://*.akamaized.net https://*.muscdn.com https://*.byteimg.com http://127.0.0.1:8765 http://localhost:8765"
+  }
+}

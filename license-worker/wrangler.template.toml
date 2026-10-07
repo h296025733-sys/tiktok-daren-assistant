@@ -1,0 +1,10 @@
+name = "tda-device-license"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+workers_dev = true
+preview_urls = false
+
+[[d1_databases]]
+binding = "LICENSE_DB"
+database_name = "tda-device-licenses"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
