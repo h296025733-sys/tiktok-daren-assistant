@@ -1,17 +1,39 @@
 # TikTok 达人助手
 
-这是我做的一个 Chrome 扩展，平时用来查看 TikTok 达人和视频数据，也把下载、评论翻译、字幕生成这些常用操作放到了一起。
+**把达人与视频数据、批量下载、评论翻译和字幕放进浏览器工作流。**
 
-当前源码版本为 `0.1.28`，主要使用 Chrome-only 构建。加载扩展即可使用主要功能，不需要另外启动本地服务。
+查看达人主页时，我希望在当前页面完成筛选、比较和素材整理；刷视频时，希望字幕与评论翻译跟得上正在看的内容。这个 Chrome MV3 扩展围绕这两种使用场景组织功能。
 
-## 现在能做什么
+当前源码版本为 `0.1.28`，主线使用 Chrome-only 构建，浏览器版主要功能不依赖本地后端。仓库保留了早期服务与授权实现，也记录了当前未通过的测试。
 
-- 读取 TikTok 页面已经公开的达人与视频数据；缺失字段保留空值。
-- 在达人主页排序、筛选、多选，下载视频、音频或批量 ZIP。
-- 单条和自动评论翻译，复用已经翻译的内容，处理滚动与 DOM 节点复用。
-- 字幕优先读取平台已有文本，没有时再使用浏览器 Whisper。
-- 字幕翻译、双语显示和视频切换后的结果隔离。
-- 按需下载和缓存语音模型，避免每次重新准备。
+## 两种页面，两类操作
+
+| 页面 | 操作 |
+| --- | --- |
+| 达人主页 | 读取公开字段，排序、筛选与多选，下载视频、音频或批量 ZIP。 |
+| 当前视频 | 获取当前视频数据，翻译评论，预览与导出字幕，显示双语结果。 |
+
+字段缺失时保留空值。字幕优先使用平台文本，再按需使用浏览器 Whisper；语音模型有下载与缓存流程。
+
+## 动态页面里的状态问题
+
+**同一个 DOM 节点未必还是同一条视频。** 活动视频会话按视频键和页面 URL 管理缓存，观察到切换时清空当前结果；过期结果需要经过归属判断才能使用。
+
+**字幕和翻译也要按视频保存。** 字幕缓存按视频 ID 组织，译文再按目标语言保存，读取时检查结构与容量。侧栏中的异步识别、取消和新视频排队共同参与切换流程。
+
+**页面数据来源有不同可信度。** 提取层分别处理 DOM、结构化数据和页面桥接信号，记录证据与缺失字段。评论翻译则需要处理滚动带来的节点复用和重复内容。
+
+**下载是一条单独的任务链。** 媒体解析、卡片队列、批量限制、命名、文件保存与 ZIP 写入各有模块，界面可以展示逐项进度与失败。
+
+## 读代码可以从这里开始
+
+| 关注点 | 入口 |
+| --- | --- |
+| 活动视频与结果归属 | [session.ts](extension/src/content/session.ts) · [activeVideo.ts](extension/src/extractors/activeVideo.ts) |
+| 多来源提取与证据 | [extractors/](extension/src/extractors/) · [evidence.ts](extension/src/content/evidence.ts) |
+| 字幕缓存与侧栏流程 | [subtitleSessionCache.ts](extension/src/sidepanel/subtitleSessionCache.ts) · [sidepanel/index.ts](extension/src/sidepanel/index.ts) |
+| 评论翻译与请求队列 | [content/translation.ts](extension/src/content/translation.ts) · [foregroundQueue.ts](extension/src/translation/foregroundQueue.ts) |
+| 批量下载与文件输出 | [downloads/](extension/src/downloads/) |
 
 ## 本地开发
 
